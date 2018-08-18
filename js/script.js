@@ -45,13 +45,17 @@ ccNumErrorP.innerHTML = "- CC Number must be between 13 and 16 digits";
 ccNumErrorP.setAttribute('id', 'error');
 ccNumErrorP.style.display = 'none';
 let ccZipErrorP = document.createElement('p');
-ccZipErrorP.innerHTML = "Zip must be 5 digits";
+ccZipErrorP.innerHTML = "- Zip must be 5 digits";
 ccZipErrorP.setAttribute('id', 'error');
 ccZipErrorP.style.display = 'none';
 let ccCVVErrorP = document.createElement('p');
 ccCVVErrorP.innerHTML = "- CVV must be 3 digits";
 ccCVVErrorP.setAttribute('id', 'error');
 ccCVVErrorP.style.display = 'none';
+let ccNumberError = document.createElement('p');
+ccNumberError.innerHTML = "- CC Number, Zip, and CVV must only contain numbers";
+ccNumberError.setAttribute('id', 'error');
+ccNumberError.style.display = 'none';
 let ccNumValid = false;
 let ccZipValid = false;
 let ccCVVValid = false;
@@ -66,6 +70,7 @@ errorBox.appendChild(checkboxErrorP);
 errorBox.appendChild(ccNumErrorP);
 errorBox.appendChild(ccZipErrorP);
 errorBox.appendChild(ccCVVErrorP);
+errorBox.appendChild(ccNumberError);
 
 //Hides HTML elements that shouldn't be displayed yet
 otherJobRole.style.display = 'none';
@@ -250,13 +255,13 @@ payment.addEventListener('click', () => {
 
 //Adds credit card info validation
 function addRequired() {
-  ccNum.required = true;
-  ccNum.minLength = 13;
-  ccNum.maxLength = 16;
-  zip.required = true;
+  // ccNum.required = true;
+  ccNum.minLength = 13
+  ccNum.maxLength = 16
+  // zip.required = true;
   zip.minLength = 5;
   zip.maxLength = 5;
-  cvv.required = true;
+  // cvv.required = true;
   cvv.minLength = 3;
   cvv.maxLength = 3;
   expMonth.required = true;
@@ -264,8 +269,20 @@ function addRequired() {
   let ccNumValid = false;
   let ccZipValid = false;
   let ccCVVValid = false;
+};
+
   //validate CC Num
-  ccNum.addEventListener('keyup', () => {
+  ccNum.setCustomValidity('CC must only contain numbers');
+  ccNum.addEventListener('keyup', (event) => {
+    let ccNumValue = event.target.value;
+    for(let n = 0; n < ccNumValue.length; n+=1) {
+      if(isNaN(ccNumValue[n])) {
+        ccNumberError.style.display = defaultDisplay;
+        ccNumValid = false;
+        ccNum.setCustomValidity('CC must only contain numbers');
+        return;
+      }
+    }
     if(ccNum.value.length < 13 || ccNum.value.length > 16) {
       ccNum.setCustomValidity('CC number must be between 13 and 16 digits.');
       ccNumErrorP.style.display = defaultDisplay;
@@ -273,11 +290,23 @@ function addRequired() {
       ccNum.setCustomValidity('');
       ccNumValid = true;
       ccNumErrorP.style.display = 'none';
-    }
+      ccPartValid()
+    };
   });
 
+
   //Validate Zip
-  zip.addEventListener('keyup', () => {
+  zip.setCustomValidity('CC must only contain numbers');
+  zip.addEventListener('keyup', (event) => {
+    let zipValue = event.target.value;
+    for(let n = 0; n < zipValue.length; n+=1) {
+      if(isNaN(zipValue[n])) {
+        ccNumberError.style.display = defaultDisplay;
+        ccZipValid = false;
+        zip.setCustomValidity('CC must only contain numbers');
+        return;
+      }
+    }
     if(zip.value.length != 5) {
       zip.setCustomValidity('Zip must be exactly 5 digits.');
       ccZipErrorP.style.display = defaultDisplay;
@@ -285,22 +314,41 @@ function addRequired() {
       zip.setCustomValidity('');
       ccZipValid = true;
       ccZipErrorP.style.display = 'none';
+      ccPartValid()
     }
   });
 
+
+
   //Validate CVV
-  cvv.addEventListener('keyup', () => {
+  cvv.setCustomValidity('CVV must only contain numbers');
+  cvv.addEventListener('keyup', (event) => {
+    let cvvValue = event.target.value;
+    for(let n = 0; n < cvvValue.length; n+=1) {
+      if(isNaN(cvvValue[n])) {
+        ccNumberError.style.display = defaultDisplay;
+        ccCVVValid = false;
+        cvv.setCustomValidity('CVV must only contain numbers');
+        return;
+      }
+    }
     if(cvv.value.length != 3) {
       cvv.setCustomValidity('CVV must be exactly 3 digits.');
-
       ccCVVErrorP.style.display = defaultDisplay;
     } else {
       cvv.setCustomValidity('');
       ccCVVValid = true;
       ccCVVErrorP.style.display = 'none';
+      ccPartValid();
     }
   });
-}
+
+
+function ccPartValid() {
+  if(ccCVVValid && ccNumValid && ccZipValid) {
+    ccNumberError.style.display = 'none';
+  }
+};
 
 //Removes credit card vaildation
 function removeRequired() {
@@ -320,6 +368,7 @@ function removeRequired() {
   ccNumErrorP.style.display = 'none';
   ccCVVErrorP.style.display = 'none';
   ccZipErrorP.style.display = 'none';
+  ccNumberError.style.display = 'none';
 };
 
 //Validate checkboxes and returns false if no boxes are checked
@@ -342,10 +391,10 @@ function validateCheckbox() {
 let emailValid = false;
 email.setCustomValidity('Please enter a valid email with an @ sign');
 email.addEventListener('keyup', (event) => {
+  email.minLength = 3
   let emailValue = event.target.value;
   for(let i = 0; i < emailValue.length; i++) {
     if(emailValue[i] == '@'){
-      console.log(emailValue[i]);
       emailValid = true;
       emailErrorP.style.display = 'none';
       email.setCustomValidity('');
@@ -356,17 +405,15 @@ email.addEventListener('keyup', (event) => {
  }
 });
 
+
+//Validates Name
 name.setCustomValidity('Name must be at least 1 letter long');
 let nameValid = false;
 name.addEventListener('keyup', (event) => {
+  name.minLength = 1
   let nameValue = event.target.value;
-  console.log(nameValue);
   for(let n = 0; n < nameValue.length; n+=1) {
-    console.log('loop num' + n)
-    console.log('running for loop for n');
     if(isNaN(nameValue[n]) == false) {
-      console.log("num is " + nameValue[n]);
-
       nameErrorNAN.style.display = defaultDisplay;
       nameValid = false;
       name.setCustomValidity('Name must not contain numbers');
@@ -392,7 +439,6 @@ function displayErrors() {
 }
 
 function checkForm() {
-  console.log('checking');
   if(emailValid && validateCheckbox() && nameValid && CCValid && ccCVVValid && ccZipValid && ccNumValid) {
     return true;
   } else {
